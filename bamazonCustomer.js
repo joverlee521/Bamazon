@@ -1,9 +1,16 @@
 const mysql = require("mysql");
 const cTable = require("console.table");
 const inquirer = require("inquirer");
+const colors = require("colors");
 
 var numberRegex = /^\d+$/;
 var greatestId = 0;
+
+colors.setTheme({
+    title: ["cyan", "bold"],
+    error: ["red", "bold"],
+    question: ["yellow", "underline"]
+})
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -21,14 +28,13 @@ function ConsoleRow(id, name, price) {
 
 connection.connect(function(err){
     if(err) throw err;
-    console.log("connected as id " + connection.threadId);
     showProducts();
 });
 
 function showProducts(){
     connection.query("SELECT * FROM products", function(err, res){
         if(err) throw err;
-        console.log("Current Products: \n");
+        console.log("\nCurrent Products: ".title);
         greatestId = res[res.length - 1].item_id;
         var table = [];
         for(var i = 0; i < res.length; i++){
@@ -44,10 +50,10 @@ function orderPrompt(greatestId){
     inquirer.prompt([
         {
             name: "id",
-            message: "Which item would you like to purchase? (Please enter the Id of the product)",
+            message: "Which item would you like to purchase(id)?".question,
             validate: function(input){
                 if(input > greatestId || input < 1 || !numberRegex.test(input)){
-                    console.log("\n Please enter a valid Id");
+                    console.log("\n Please enter a valid Id".error);
                     return false;
                 }
                 else{
@@ -57,13 +63,13 @@ function orderPrompt(greatestId){
         },
         {
             name: "quantity",
-            message: "How many would you like to purchase?",
+            message: "How many would you like to purchase?".question,
             validate: function(input){
                 if(numberRegex.test(input)){
                     return true;
                 }
                 else{
-                    console.log("Please enter whole numbers");
+                    console.log("Please enter whole numbers".error);
                     return false;
                 }
             }
@@ -71,7 +77,7 @@ function orderPrompt(greatestId){
     ]).then(function(input){
         var id = input.id;
         var quantity = input.quantity;
-        console.log("\n Checking out...");
+        console.log("\n Checking out...".magenta);
         checkStorage(id, quantity);
     })
 }
@@ -85,7 +91,7 @@ function checkStorage(id, quantity){
             var currentStock = res[0].stock_quantity;
             var price = res[0].price;
             if(quantity > currentStock){
-                console.log("\n Order Failed! Insufficient storage to complete the order!");
+                console.log("\n Order Failed! Insufficient storage to complete the order!".error);
                 orderPrompt(greatestId);
             }
             else{
@@ -110,7 +116,7 @@ function updateStorage(newStock, id, quantity, price){
         function(err, res){
             if(err) throw err;
             var totalCost = quantity * price;
-            console.log("The total cost of your order is $" + totalCost);
+            console.log(colors.magenta("The total cost of your order is $",totalCost));
             restartPrompt();
         }
     )
@@ -121,7 +127,7 @@ function restartPrompt(){
         {
             type: "confirm",
             name: "confirm",
-            message: "Would you like to continue shopping?",
+            message: "Would you like to continue shopping?".question,
             default: true
         }
     ]).then(function(input){
@@ -129,7 +135,7 @@ function restartPrompt(){
             showProducts();
         }
         else{
-            console.log("Thank you for shopping with Bamazon!");
+            console.log("Thank you for shopping with Bamazon!".magenta);
             connection.end();
         }
     })
