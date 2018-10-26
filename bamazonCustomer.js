@@ -131,7 +131,7 @@ function updateStorage(newStock, id, quantity, price){
         function(err, res){
             if(err) throw err;
             var totalCost = quantity * price;
-            console.log(colors.magenta("The total cost of your order is $",totalCost + "\n"));
+            console.log(colors.magenta("The total cost of your order is","$"+ totalCost + "\n"));
             restartPrompt();
         }
     )
