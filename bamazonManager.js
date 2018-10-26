@@ -2,6 +2,8 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 
+var numberRegex = /^\d+$/;
+
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -38,6 +40,9 @@ function menuOptions(){
             case "View Low Inventory":
                 showLowInventory();
                 break;
+            case "Add to Inventory":
+                inventoryPrompt();
+                break;
         }
     })
 }
@@ -71,6 +76,70 @@ function showLowInventory(){
             console.log("Products with low inventory: \n")
            printProducts(res);
            connection.end();
+        }
+    )
+}
+
+function inventoryPrompt(){
+    inquirer.prompt([
+        {
+            name: "product",
+            message: "To which product are you adding inventory(Id)?",
+            validate: function(input){
+                if(!numberRegex.test(input)){
+                    console.log("\n Please enter a valid Id".error);
+                    return false;
+                }
+                else{
+                    return true;
+                }
+            }
+        },
+        {
+            name: "quantity",
+            message: "How many are you adding?",
+            validate: function(input){
+                if(numberRegex.test(input)){
+                    return true;
+                }
+                else{
+                    console.log("Please enter whole numbers".error);
+                    return false;
+                }
+            }
+        }
+    ]).then(function(input){
+        var id = input.product;
+        var quantity = input.quantity;
+        addInventory(id, quantity);
+    })
+}
+
+function addInventory(id, quantity){
+    connection.query(
+        "SELECT stock_quantity FROM products WHERE item_id = ?", 
+        [id],
+        function(err, res){
+            if(err) throw err;
+            var currentStock = res[0].stock_quantity;
+            var newStock = parseInt(currentStock) + parseInt(quantity);
+            connection.query(
+                "UPDATE products SET ? WHERE ?", 
+                [
+                    {
+                        stock_quantity: newStock
+                    },
+                    {
+                        item_id: id
+                    }
+                ],
+                function(err, res){
+                    if(err) throw err;
+                    console.log("Updated inventory of Item Id: " + id);
+                    console.log("New stock quantity: " + newStock);
+                    connection.end();
+                }
+            )
         }
     )
 }
