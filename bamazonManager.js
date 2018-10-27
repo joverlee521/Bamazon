@@ -3,6 +3,7 @@ const inquirer = require("inquirer");
 const cTable = require("console.table");
 
 var numberRegex = /^\d+$/;
+var priceRegex = /^(\d*([.,](?=\d{3}))?\d+)+((?!\2)[.,]\d\d)?$/;
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -43,6 +44,9 @@ function menuOptions(){
             case "Add to Inventory":
                 inventoryPrompt();
                 break;
+            case "Add new Product":
+                addProductPrompt();
+                break;
         }
     })
 }
@@ -73,8 +77,13 @@ function showLowInventory(){
         "SELECT * FROM products WHERE stock_quantity BETWEEN 0 and 5 ",
         function(err, res){
             if(err) throw err;
-            console.log("Products with low inventory: \n")
-           printProducts(res);
+            if(res.length > 0){
+                console.log("Products with low inventory: \n")
+                printProducts(res);
+            }
+            else{
+                console.log("All products are adequately stocked!");
+            }
            connection.end();
         }
     )
@@ -87,7 +96,7 @@ function inventoryPrompt(){
             message: "To which product are you adding inventory(Id)?",
             validate: function(input){
                 if(!numberRegex.test(input)){
-                    console.log("\n Please enter a valid Id".error);
+                    console.log("\n Please enter a valid Id");
                     return false;
                 }
                 else{
@@ -140,6 +149,67 @@ function addInventory(id, quantity){
                     connection.end();
                 }
             )
+        }
+    )
+}
+
+function addProductPrompt(){
+    inquirer.prompt([
+        {
+            name: "name",
+            message: "What product are you adding?"
+        }, 
+        {
+            type: "list",
+            name: "department",
+            message: "What department is the product under?",
+            choices: ["Books", "Clothing", "Electronics","Furniture", "Grocery", "Kitchen", "Instruments", "Pet Supplies", "Video Games"]
+        },
+        {
+            name: "price",
+            message: "What is the price per unit?",
+            validate: function(input){
+                if(priceRegex.test(input)){
+                    return true;
+                }
+                else{
+                    console.log("\n Please enter a valid price");
+                    return false;
+                }
+            }
+        },
+        {
+            name: "quantity",
+            message: "How many are you putting in stock?",
+            validate: function(input){
+                if(numberRegex.test(input)){
+                    return true;
+                }
+                else{
+                    console.log("\n Please enter whole numbers");
+                    return false;
+                }
+            }
+        }
+    ]).then(function(input){
+        var {name, department, price, quantity} = input;
+        addNewProduct(name, department, price, quantity);
+    })
+}
+
+function addNewProduct(name, department, price, quantity){
+    connection.query(
+        "INSERT INTO products SET ?",
+        {
+            product_name: name,
+            department_name: department,
+            price: price,
+            stock_quantity: quantity
+        },
+        function(err, res){
+            if(err) throw err;
+            console.log("The new product has been added!");
+            connection.end();
         }
     )
 }
