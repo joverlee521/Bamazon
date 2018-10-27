@@ -103,6 +103,7 @@ function checkStorage(id, quantity){
             if(err) throw err;
             var currentStock = res[0].stock_quantity;
             var price = res[0].price;
+            var sales = res[0].product_sales;
             // If not enough product in stock, alert customer and restart order prompt
             if(quantity > currentStock){
                 console.log("\n Order Failed! Insufficient storage to complete the order!".error);
@@ -110,19 +111,22 @@ function checkStorage(id, quantity){
             }
             else{
                 var newStock = currentStock - quantity;
-                updateStorage(newStock, id, quantity, price);
+                updateStorage(newStock, id, quantity, price, sales);
             }
         }
     )
 }
 
 // Update database with new product quantity after customer's purchase and gives customer total cost of purchase
-function updateStorage(newStock, id, quantity, price){
+function updateStorage(newStock, id, quantity, price, sales){
+    var totalCost = quantity * price;
+    var newSales = sales + totalCost;
     connection.query(
         "UPDATE products SET ? WHERE ?",
         [
             {
-                stock_quantity: newStock
+                stock_quantity: newStock,
+                product_sales: newSales
             },
             {
                 item_id: id
@@ -130,7 +134,6 @@ function updateStorage(newStock, id, quantity, price){
         ],
         function(err, res){
             if(err) throw err;
-            var totalCost = quantity * price;
             console.log(colors.magenta("The total cost of your order is","$"+ totalCost + "\n"));
             restartPrompt();
         }
