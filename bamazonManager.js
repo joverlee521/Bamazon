@@ -3,7 +3,7 @@ const inquirer = require("inquirer");
 const cTable = require("console.table");
 
 var numberRegex = /^\d+$/;
-var priceRegex = /^(\d*([.,](?=\d{3}))?\d+)+((?!\2)[.,]\d\d)?$/;
+var priceRegex = /^[\d\.,]+$/;
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -67,7 +67,7 @@ function showAllProducts(){
             if(err) throw err;
             console.log("Current Products: \n");
             printProducts(res);
-            connection.end();
+            restartPrompt();
         }
     )
 }
@@ -84,7 +84,7 @@ function showLowInventory(){
             else{
                 console.log("All products are adequately stocked!");
             }
-           connection.end();
+            restartPrompt();
         }
     )
 }
@@ -146,7 +146,7 @@ function addInventory(id, quantity){
                     if(err) throw err;
                     console.log("Updated inventory of Item Id: " + id);
                     console.log("New stock quantity: " + newStock);
-                    connection.end();
+                    restartPrompt();
                 }
             )
         }
@@ -209,7 +209,26 @@ function addNewProduct(name, department, price, quantity){
         function(err, res){
             if(err) throw err;
             console.log("The new product has been added!");
-            connection.end();
+            restartPrompt();
         }
     )
+}
+
+function restartPrompt(){
+    inquirer.prompt([
+        {
+            type: "confirm",
+            name: "confirm",
+            message: "Would you like to use another command?",
+            default: true
+        }
+    ]).then(function(input){
+        if(input.confirm){
+            menuOptions();
+        }
+        else{
+            console.log("Goodbye!");
+            connection.end();
+        }
+    })
 }
