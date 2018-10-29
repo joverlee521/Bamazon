@@ -2,6 +2,8 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 
+var priceRegex = /^[\d\.,]+$/;
+
 var connection = mysql.createConnection({
     host: "localhost",
     port: 3306,
@@ -20,6 +22,7 @@ function ConsoleRow(id, name, cost, sales){
     this.department_name = name;
     this.over_head_costs = cost;
     this.product_sales = sales;
+    this.total_profit = sales - cost;
 }
 
 function supervisorMenu(){
@@ -35,7 +38,7 @@ function supervisorMenu(){
             viewSales();
         }
         else{
-
+            createPrompt();
         }
     })
 }
@@ -51,6 +54,46 @@ function viewSales(){
                 table.push(newRow);
             }
             console.table(table);
+            connection.end();
+        }
+    )
+}
+
+function createPrompt(){
+    inquirer.prompt([
+        {
+            name: "name",
+            message: "What's the new department name?"
+        },
+        {
+            name: "cost",
+            message: "How much is the over head cost?",
+            validate: function(input){
+                if(priceRegex.test(input)){
+                    return true;
+                }
+                else{
+                    console.log("\n Please enter a valid cost!");
+                    return false;
+                }
+            }
+        }
+    ]).then(function(input){
+        var {name, cost} = input;
+        createDepartment(name, cost);
+    })
+}
+
+function createDepartment(name, cost){
+    connection.query(
+        "INSERT INTO departments SET ?",
+        {
+            department_name: name,
+            over_head_costs: cost
+        },
+        function(err, res){
+            if(err) throw err;
+            console.log("New department has been created!");
             connection.end();
         }
     )
