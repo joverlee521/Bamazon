@@ -54,7 +54,7 @@ function viewSales(){
                 table.push(newRow);
             }
             console.table(table);
-            connection.end();
+            restartPrompt();
         }
     )
 }
@@ -94,7 +94,26 @@ function createDepartment(name, cost){
         function(err, res){
             if(err) throw err;
             console.log("New department has been created!");
-            connection.end();
+            restartPrompt();
         }
     )
+}
+
+function restartPrompt(){
+    inquirer.prompt([
+        {
+            type: "confirm",
+            name: "confirm",
+            message: "Would you like to use another command?",
+            default: true
+        }
+    ]).then(function(input){
+        if(input.confirm){
+            supervisorMenu();
+        }
+        else{
+            console.log("Have a nice day!")
+            connection.end();
+        }
+    })
 }
