@@ -4,6 +4,8 @@ const cTable = require("console.table");
 
 var numberRegex = /^\d+$/;
 var priceRegex = /^[\d\.,]+$/;
+var departmentNames = [];
+var array = ["1","2","3","4","5","6","7","8","9","10","11"];
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -45,7 +47,7 @@ function menuOptions(){
                 inventoryPrompt();
                 break;
             case "Add new Product":
-                addProductPrompt();
+                listDepartments();
                 break;
         }
     })
@@ -153,6 +155,21 @@ function addInventory(id, quantity){
     )
 }
 
+function listDepartments(){
+    departmentNames = [];
+    connection.query(
+        "SELECT department_name FROM departments",
+        function(err, res){
+            if(err) throw err;
+            for(var i = 0; i < res.length; i ++){
+                var department = res[i].department_name;
+                departmentNames.push(department);
+            }
+            addProductPrompt();
+        }
+    )
+}
+
 function addProductPrompt(){
     inquirer.prompt([
         {
@@ -163,7 +180,7 @@ function addProductPrompt(){
             type: "list",
             name: "department",
             message: "What department is the product under?",
-            choices: ["Books", "Clothing", "Electronics","Furniture", "Grocery", "Kitchen", "Instruments", "Pet Supplies", "Video Games"]
+            choices: departmentNames
         },
         {
             name: "price",
