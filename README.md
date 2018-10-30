@@ -12,7 +12,16 @@ A command-line app that mimics the Amazon storefront using MySQL database. The a
     * `node bamazonSupervisor.js`
 
 ### Customer View
-1. Upon entering the customer view, the app will list all of the current products in the database and ask the customer which product they would like to purchase:
+1. Upon entering the customer view, the app will list all of the current products in the database and ask you which product you would like to purchase:
 
     ![customer_start](../master/images/customer_start.png)
 
+1. Enter the id of the product and the quantity you would like to purchase
+
+    * If there is enough of the product in storage to meet your request, the app will return the total cost of your order: 
+
+        ![customer_purchase](../master/images/customer_purchase.png)
+
+    * If storage is not sufficent, the app will alert you that the order failed and ask if you would like to continue shopping:
+
+        ![order_failed](../master/images/order_failed.png)

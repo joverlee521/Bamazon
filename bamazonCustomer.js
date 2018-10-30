@@ -106,8 +106,8 @@ function checkStorage(id, quantity){
             var sales = res[0].product_sales;
             // If not enough product in stock, alert customer and restart order prompt
             if(quantity > currentStock){
-                console.log("\n Order Failed! Insufficient storage to complete the order!".error);
-                orderPrompt(greatestId);
+                console.log("\n Order Failed! Insufficient storage to complete the order! \n".error);
+                restartPrompt();
             }
             else{
                 var newStock = currentStock - quantity;
