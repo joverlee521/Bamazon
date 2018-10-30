@@ -25,3 +25,7 @@ A command-line app that mimics the Amazon storefront using MySQL database. The a
     * If storage is not sufficent, the app will alert you that the order failed and ask if you would like to continue shopping:
 
         ![order_failed](../master/images/order_failed.png)
+
+1. If you choose to continue shopping, the app will list all of the current products again:
+
+    ![continue_shopping](../master/images/continue_shopping.png)
