@@ -33,7 +33,7 @@ A command-line app that mimics the Amazon storefront using MySQL database. The a
 ### Manager View
 1. When using the manager view, the app will list four commands: 
 
-    ![manager_commands](../master/images/master_commands.png)
+    ![manager_commands](../master/images/manager_commands.png)
 
     * `View Products for Sale` will display all of the products currently for sale:
 
