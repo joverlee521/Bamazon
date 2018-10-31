@@ -75,3 +75,11 @@ A command-line app that mimics the Amazon storefront using MySQL database. The a
 1. When finished with your current command, the app will ask if you like to use another command:
 
     ![another_supervisor_command](../master/images/another_supervisor_command.png)
+
+## Technologies Used
+
+* JavaScript, Node.js
+* [MySQL](https://www.npmjs.com/package/mysql)
+* [Console.table](https://www.npmjs.com/package/console.table)
+* [Inquirer](https://www.npmjs.com/package/inquirer)
+* [Colors](https://www.npmjs.com/package/colors)
