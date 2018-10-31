@@ -58,3 +58,20 @@ A command-line app that mimics the Amazon storefront using MySQL database. The a
 1. When done with current command, the app will ask if you would like to use another command: 
 
     ![another_command](../master/images/another_command.png)
+
+### Supervisor View
+1. The supervisor view allows you to view product sales by department or create a new department:
+
+    ![supervisor_commands](../master/images/supervisor_commands.png)
+
+    * `View Product Sales by Department` gives an overview of product sales and total profit for each department:
+
+        ![product_sales](../master/images/product_sales.png)
+    
+    * `Create New Department` allows you to create a new deparment. The app asks for the name and over head cost of the new department:
+
+        ![new_department](../master/images/new_department.png)
+    
+1. When finished with your current command, the app will ask if you like to use another command:
+
+    ![another_supervisor_command](../master/images/another_supervisor_command.png)
