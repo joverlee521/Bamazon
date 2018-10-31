@@ -3,6 +3,7 @@ const inquirer = require("inquirer");
 const cTable = require("console.table");
 
 var priceRegex = /^[\d\.,]+$/;
+var departments = [];
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -38,7 +39,7 @@ function supervisorMenu(){
             viewSales();
         }
         else{
-            createPrompt();
+            checkDepartments();
         }
     })
 }
@@ -59,11 +60,36 @@ function viewSales(){
     )
 }
 
+function checkDepartments(){
+    departments = [];
+    connection.query(
+        "SELECT department_name FROM departments",
+        function(err, res){
+            if(err) throw err;
+            for(var i = 0; i < res.length; i++){
+                var name = res[i].department_name.toLowerCase();
+                departments.push(name);
+            }
+            console.log(departments);
+            createPrompt();
+        }
+    )
+}
+
 function createPrompt(){
     inquirer.prompt([
         {
             name: "name",
-            message: "What's the new department name?"
+            message: "What's the new department name?",
+            validate: function(input){
+                if(departments.indexOf(input.toLowerCase()) >= 0){
+                    console.log("\n This department already exists!");
+                    return false;
+                }
+                else{
+                    return true;
+                }
+            }
         },
         {
             name: "cost",
